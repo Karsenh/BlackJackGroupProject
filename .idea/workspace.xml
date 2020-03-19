@@ -14,7 +14,11 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1ZH5OJO6fiOQpC6rm1bnVibkonC" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -26,6 +30,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -55,6 +60,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
+    <state x="552" y="179" key="#Notifications" timestamp="1584569089483">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="179" key="#Notifications/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584569089483" />
     <state x="-1264" y="182" key="#Project_Structure" timestamp="1584483157950">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -64,22 +73,30 @@
     </state>
     <state x="-1051" y="233" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@-1920.0.1920.1040" timestamp="1584483442839" />
     <state x="869" y="233" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584493570426" />
-    <state width="1877" height="157" key="GridCell.Tab.0.bottom" timestamp="1584507797722">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1584596382848">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="157" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584507797722" />
-    <state width="1877" height="157" key="GridCell.Tab.0.center" timestamp="1584507797722">
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596382848" />
+    <state width="1877" height="157" key="GridCell.Tab.0.bottom" timestamp="1584596748271">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="157" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584507797722" />
-    <state width="1877" height="157" key="GridCell.Tab.0.left" timestamp="1584507797722">
+    <state width="1877" height="157" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596748271" />
+    <state width="1877" height="157" key="GridCell.Tab.0.center" timestamp="1584596748271">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="157" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584507797722" />
-    <state width="1877" height="157" key="GridCell.Tab.0.right" timestamp="1584507797722">
+    <state width="1877" height="157" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596748271" />
+    <state width="1877" height="157" key="GridCell.Tab.0.left" timestamp="1584596748271">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="157" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584507797722" />
+    <state width="1877" height="157" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596748271" />
+    <state width="1877" height="157" key="GridCell.Tab.0.right" timestamp="1584596748271">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="157" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596748271" />
+    <state x="461" y="163" key="SettingsEditor" timestamp="1584596518599">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1584596518599" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1584493270360">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
