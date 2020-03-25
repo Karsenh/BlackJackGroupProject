@@ -12,8 +12,13 @@ public class Main implements Runnable {
         new Thread(new Main()).start();
     }
 
+    //This override run method only runs a single time to refresh the JPanel window
     @Override
     public void run() {
+        //Infinite while loop to continuously refresh the GUI class 'Board' JPanel paintComponent as cards are updated
+        while (true) {
+            gui.repaint();
+        }
 
     }
 }

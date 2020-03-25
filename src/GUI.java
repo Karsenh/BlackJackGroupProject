@@ -25,6 +25,7 @@ public class GUI extends JFrame {
 
     //FONTS
     Font fontButton = new Font("Times New Roman", Font.PLAIN, 30); //Font name, type, size
+    Font fontCard = new Font("Times New Roman", Font.BOLD, 40); //Card Font
 
     //BUTTONS
     JButton bHit = new JButton();                                 //'Hit' jbutton for new card
@@ -39,11 +40,12 @@ public class GUI extends JFrame {
     int gridh = 400;
 
     //CARD DIMENSIONS & SPACING
-    int cardSpacing = 10;
+    int cardSpacing = 10;                                       //Spacing Between Cards
+    int cardEdgeSoftening = 6;                                  //Card Corner Edge Softener
     int cardTW = gridw/6;                                       //Card Total Width = gridw(idth) / 6 card spots
     int cardTH = gridh/2;                                       //Card Total Height = gridh(eight) / 6 card spots
-    int cardAW = cardTW - 2 * cardSpacing;
-    int cardAH = cardTH - 2 * cardSpacing;
+    int cardAW = cardTW - 2 * cardSpacing;                      //Card Total Width
+    int cardAH = cardTH - 2 * cardSpacing;                      //Card Total Height
 
     //TOTALS & COMMAND LOG GRID POSITIONING & DIMENSIONS
     int hsx = gridx + gridw + 50;
@@ -57,9 +59,16 @@ public class GUI extends JFrame {
     int pmw = hsw;
     int pmh = 200;
 
+    //ARRAY LIST CONTAINING ALL CARDS
+    ArrayList<Card> allCards = new ArrayList<Card>();
+    ArrayList<Card> playerCards = new ArrayList<Card>();
+    ArrayList<Card> dealerCards = new ArrayList<Card>();
+
+    int rand = new Random().nextInt(52);                //Generates random integer from 1-51 for random dealing
+
     //GUI Constructor
     public GUI() {
-        //PRIMARY SPECIFICATIONS
+        //PRIMARY ATTRIBUTES
         this.setSize(aW + 6, aH + 6);             //Set Application Size
         this.setTitle("PlaguedJack");                           //Set Application Title
         this.setVisible(true);                                  //Enable visibility
@@ -106,31 +115,130 @@ public class GUI extends JFrame {
         bNo.setFont(fontButton);                                    //Set 'Stay' button font
         bNo.setText("No");                                          //'Stay' text
         board.add(bNo);                                             //Add 'Stay' button to board
+
+        String suitS1 = null;                                         //Assign Suit
+        int id_setter = 0;                                          //Assign ID for every card
+
+        for (int s = 0; s < 4; ++s) {
+            if(s == 0) {
+                suitS1 = "Spades";
+            } else if (s == 1) {
+                suitS1 = "Hearts";
+            } else if (s == 2) {
+                suitS1 = "Diamonds";
+            } else suitS1 = "Clubs";
+            for (int i = 2; i < 15; ++i) {
+                allCards.add(new Card(i, suitS1, id_setter));
+                id_setter++;                                         //New ID for every card created
+            }
+        }
+
+        //CARD ASSIGNMENT ATTRIBUTES
+        rand = new Random().nextInt(52);              //Generate random number 1-51 to draw from allCards
+        playerCards.add(allCards.get(rand));                 //Randomly add new card to playerCards from allCards
+        allCards.get(rand).cardUsed = true;
+
+        //DEAL CARDS
+        //Dealer First Card Assignment:
+        rand = new Random().nextInt(52);
+        while(true) {                                       //Check if same number
+            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
+                dealerCards.add(allCards.get(rand));        // Assign to dealers hand
+                allCards.get(rand).cardUsed = true;         // Then set that card to used
+                break;
+            } else {
+                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
+            }
+        }
+        //Player First Card Assignment:
+        rand = new Random().nextInt(52);
+        while(true) {                                       //Check if same number
+            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
+                playerCards.add(allCards.get(rand));        // Assign to dealers hand
+                allCards.get(rand).cardUsed = true;         // Then set that card to used
+                break;
+            } else {
+                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
+            }
+        }
+        //Dealer Second Card Assignment:
+        rand = new Random().nextInt(52);
+        while(true) {                                       //Check if same number
+            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
+                dealerCards.add(allCards.get(rand));        // Assign to dealers hand
+                allCards.get(rand).cardUsed = true;         // Then set that card to used
+                break;
+            } else {
+                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
+            }
+        }
+        //Print Cards Dealt
+        for (Card c : playerCards) {
+            System.out.println("Player has the card " + c.name + " of " + c.suit);
+        }
+        for (Card c : dealerCards) {
+            System.out.println("Dealer has the card " + c.name + " of " + c.suit);
+        }
     }
 
     //GAME BOARD
     public class Board extends JPanel {
+        //PAINTING ENTIRE BOARD
         public void paintComponent(Graphics g) {
             g.setColor(colorBackground);                            //Game board background
             g.fillRect(0, 0, aW, aH);                        //Game board (Background) dimensions
 
-            //Draws Temporary Top Grid Paint
+            //Paints Temporary Top Grid Paint
             g.setColor(Color.black);
             g.drawRect(gridx, gridy, gridw, gridh);
 
-            //Draws Temporary Bottom Log Borders
+            //Paints Temporary Bottom Log Borders
             g.drawRect(gridx, gridy + gridh + 50, gridw, 500);
 
-            //Draws Temporary Totals & Command Messages
+            //Paints Temporary Totals & Command Messages
             g.drawRect(hsx, hsy, hsw, hsh);
 
-            //Draws Temporary "Play More?" Grid
+            //Paints Temporary "Play More?" Grid
             g.drawRect(pmx, pmy, pmw, pmh);
 
+            //Paints card grid rectangles
             for (int i = 0; i < 6; ++i) {
-                g.drawRect(gridx + i * cardTW + cardSpacing, gridy + cardSpacing, cardAW, cardAH);
-                g.drawRect(gridx + i * cardTW + cardSpacing, gridy + cardSpacing + cardTH, cardAW, cardAH);
+                //g.drawRect(gridx + i * cardTW + cardSpacing, gridy + cardSpacing, cardAW, cardAH);
+                //g.drawRect(gridx + i * cardTW + cardSpacing, gridy + cardSpacing + cardTH, cardAW, cardAH);
             }
+
+            //PAINTING CARDS
+            int index = 0;                          //Creates new card
+            for (Card c : playerCards) {
+                g.setColor(Color.white);            //Create card background color
+
+                //First RECTANGLE drawn for card edge softening (Height)
+                g.fillRect(gridx + index * cardTW + cardSpacing, gridy + cardSpacing + cardEdgeSoftening, cardAW, cardAH - 2 * cardEdgeSoftening);
+                //Second RECTANGLE drawn for card edge softening (Width)
+                g.fillRect(gridx + index * cardTW + cardSpacing + cardEdgeSoftening, gridy + cardSpacing, cardAW - 2 * cardEdgeSoftening, cardAH);
+                //First CIRCLE drawn for curved corner - TOP LEFT
+                g.fillOval(gridx + index * cardTW + cardSpacing, gridy + cardSpacing, 2 * cardEdgeSoftening, 2 * cardEdgeSoftening);
+                //Second CIRCLE drawn for curved corner - Top RIGHT
+                g.fillOval(gridx + index * cardTW + cardSpacing + cardAW - 2 * cardEdgeSoftening, gridy + cardSpacing, 2 * cardEdgeSoftening, 2 * cardEdgeSoftening);
+                //Third CIRCLE drawn for curved corner - BOTTOM LEFT
+                g.fillOval(gridx + index * cardTW + cardSpacing, gridy + cardSpacing + cardAH - 2 * cardEdgeSoftening, 2 * cardEdgeSoftening, 2 * cardEdgeSoftening);
+                //Fourth CIRCLE drawn for curved corner - Bottom RIGHT
+                g.fillOval(gridx + index * cardTW + cardSpacing + cardAW - 2 * cardEdgeSoftening, gridy + cardSpacing + cardAH - 2 * cardEdgeSoftening, 2 * cardEdgeSoftening, 2 * cardEdgeSoftening);
+
+                g.setColor(Color.black);            //Card suit default color
+                //If the suit is a Diamond or Heart - Make cards red
+                if (c.suit.equalsIgnoreCase("Hearts") || c.suit.equalsIgnoreCase("Diamonds")) {
+                    g.setColor(Color.red);
+                }
+                g.setFont(fontCard);
+                g.drawString(c.symbol, gridx + index * cardTW + cardSpacing*2, gridy + cardAH);
+                if (c.symbol.equalsIgnoreCase("Spades")) {
+                    g.setColor(Color.black);
+                    g.fillOval(gridx+index*cardTW+30, gridy+cardAH/2-10, 20, 20);
+                }
+                index++;                            //Next card slot
+            }
+
         }
     }
 
