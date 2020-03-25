@@ -17,6 +17,7 @@ public class Main implements Runnable {
     public void run() {
         //Infinite while loop to continuously refresh the GUI class 'Board' JPanel paintComponent as cards are updated
         while (true) {
+            gui.refresher();
             gui.repaint();
         }
 
