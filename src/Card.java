@@ -32,7 +32,7 @@ public class Card {
         } else {
             symbol = "A";
             name = "Ace";
-            value = 1;
+            value = 11;
         }
 
         /**
