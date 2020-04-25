@@ -1,31 +1,52 @@
 /*
-Title:              CPSC224 Group Project - 'PlaguedJack' GUI
+Title:              CPSC224 Group Project - 'PlagueJack' GUI
 Author(s):          Karsen Hansen
 Creation Date:      3.17.2020
 */
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.ActionListener;                           //Implemented separately from above import
 
-
-//GRAPHIC USER INTERFACE
+/**
+ * Graphic User Interface (GUI) Class for the PlagueJack Game
+ *
+ * @author Karsen Hansen
+ * @version 1.0
+ */
 public class GUI extends JFrame {
 
+    /**
+     * 1. Resolution variables
+     * 2. Game phase booleans
+     * 3. Color objects
+     * 4. Font objects
+     * 5. Question strings
+     * 6. JButton objects
+     * 7. Health variables
+     * 8. JProgressBar objects
+     * 9. Card Location grid variables
+     * 10. Card dimensions and spacing
+     * 11. Detail Log dimensions
+     * 12. Deck and Hand objects
+     * 13. JLabels and Hand Status booleans
+     */
     //RESOLUTIONS
     int aW = 1280;                                              //Actual screen resolution Width
     int aH = 800;                                               //Actual screen resolution Height
 
     //GAME PHASE BOOLEANS
-    boolean bool_hit_stay = true;                               //
-    boolean bool_dealer_turn = false;                           //
-    boolean bool_play_more = false;                             //
+    boolean bool_hit_stay = true;
+    boolean bool_dealer_turn = false;
+    boolean bool_play_more = false;
 
     //COLORS
-    Color colorBackground = new Color(39, 119, 20);   //Background Colors RGB values
+    Color colorBackground = new Color(39, 119, 20);     //Background Colors RGB values
+    Color barColor = new Color(80, 200, 80);            //Background Colors RGB values
     Color colorButton = new Color(204, 189, 0);         //Yes & No Button Colors
     Color colorHitButton = new Color(204, 183, 4);      //Hit Button Color
     Color colorStayButton = new Color(203, 204, 201);   //Stay Button Color
@@ -33,7 +54,8 @@ public class GUI extends JFrame {
     //FONTS
     Font fontButton = new Font("Times New Roman", Font.PLAIN, 30); //Font name, type, size
     Font fontCard = new Font("Times New Roman", Font.BOLD, 40); //Card Font
-    Font fontQuestion = new Font("Times New Roman", Font.BOLD, 40);
+    Font fontQuestion = new Font("Times New Roman", Font.BOLD, 30);
+    Font fontScore = new Font("Times New Roman", Font.BOLD, 20);
 
     //QUESTIONS
     String play_more_q = "Play More?";
@@ -41,8 +63,12 @@ public class GUI extends JFrame {
     //BUTTONS
     JButton bHit = new JButton();                                 //'Hit' jbutton for new card
     JButton bStay = new JButton();                                //'Stay' jbutton for turn pass
-    JButton bYes = new JButton();                                 //'Yes' jbutton
-    JButton bNo = new JButton();                                  //'No' jbutton
+    JButton btnGame = new JButton();
+
+    private int playerHealth = 100;
+    private int dealerHealth = 100;
+    JProgressBar playerBar = new JProgressBar(0, playerHealth);
+    JProgressBar dealerBar = new JProgressBar(0, dealerHealth);
 
     //CARD SPOT GRID POSITIONING & DIMENSIONS
     int gridx = 50;
@@ -70,21 +96,24 @@ public class GUI extends JFrame {
     int pmw = hsw;
     int pmh = 200;
 
-    //ARRAY LIST CONTAINING ALL CARDS
-    ArrayList<Card> allCards = new ArrayList<Card>();
-    ArrayList<Card> playerCards = new ArrayList<Card>();
-    ArrayList<Card> dealerCards = new ArrayList<Card>();
+    // Deck and Hands
+    private Deck deck = new Deck();
+    private Hand player = new Hand();
+    private Hand dealer = new Hand();
 
-    //PLAYER - DEALER TOTALS
-    int total_player_max;
-    int total_player_min;
-    int total_dealer_max;
-    int total_dealer_min;
+    //JLABELS AND HAND STATUS BOOLEANS
+    private JLabel lblPlayerScore;
+    private JLabel lblDealScore;
+    private JLabel lblMessage;
+    private boolean isPlayerBusted;
+    private boolean isPlayerBlackJack;
+    private boolean isDealerBusted;
+    private boolean isDealerBlackJack;
+    private boolean loser;
 
-
-    int rand = new Random().nextInt(52);                //Generates random integer from 1-51 for random dealing
-
-    //GUI Constructor
+    /**
+     * GUI Constructor
+     */
     public GUI() {
         //PRIMARY ATTRIBUTES
         this.setSize(aW + 6, aH + 6);             //Set Application Size
@@ -93,10 +122,46 @@ public class GUI extends JFrame {
         this.setResizable(false);                               //Can't resize
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);    //Close frame & terminate app on 'x'
 
+        playerBar.setValue(playerHealth);
+        dealerBar.setValue(dealerHealth);
+
         //BOARD
         Board board = new Board();
         this.setContentPane(board);                             //Set Content Pane to board
         this.setLayout(null);                                   //Set Layout to 'null' to update dimensions
+
+        lblMessage = new JLabel("Player's Turn", JLabel.CENTER);
+        lblMessage.setBounds(20, 540, 700, 50);
+        lblMessage.setFont(fontQuestion);
+        lblMessage.setForeground(Color.WHITE);
+        board.add(lblMessage);
+
+        playerBar.setBounds(100, 600, 700, 30);
+        playerBar.setForeground(barColor);
+        playerBar.setBackground(Color.black);
+        playerBar.setString("Player: 100%");
+        playerBar.setStringPainted(true);
+
+        board.add(playerBar);
+
+        dealerBar.setBounds(100, 650, 700, 30);
+        dealerBar.setForeground(barColor);
+        dealerBar.setBackground(Color.black);
+        dealerBar.setString("Dealer: 100%");
+        dealerBar.setStringPainted(true);
+        board.add(dealerBar);
+
+        lblPlayerScore = new JLabel("Player Score: ", JLabel.CENTER);
+        lblPlayerScore.setBounds(900, 540, 400, 50);
+        lblPlayerScore.setFont(fontScore);
+        lblPlayerScore.setForeground(Color.WHITE);
+        board.add(lblPlayerScore);
+
+        lblDealScore = new JLabel("Player Score: ", JLabel.CENTER);
+        lblDealScore.setBounds(900, 600, 400, 50);
+        lblDealScore.setFont(fontScore);
+        lblDealScore.setForeground(Color.WHITE);
+        board.add(lblDealScore);
 
         //'HIT' Button
         ActHit aHit = new ActHit();                             //Action listener object for 'Hit'
@@ -110,157 +175,173 @@ public class GUI extends JFrame {
         //'STAY' Button
         ActStay aStay = new ActStay();                              //Action listener object for 'Stay'
         bStay.addActionListener(aStay);                             //Linking action (aStay) to 'Stay' button (bStay)
-        bStay.setBounds(hsx + 55, hsy + 280, 120, 80);    //Set 'Stay' button location & dimensions
+        bStay.setBounds(hsx + 55, hsy + 140, 120, 80);    //Set 'Stay' button location & dimensions
         bStay.setBackground(colorStayButton);                           //Set 'Stay' button color
         bStay.setFont(fontButton);                                  //Set 'Stay' button font
         bStay.setText("STAY");                                      //'Stay' text
         board.add(bStay);                                           //Add 'Stay' button to board
 
-        //'YES' Button
-        ActYes aYes = new ActYes();                              //Action listener object for 'Yes'
-        bYes.addActionListener(aYes);                             //Linking action to 'Yes' button
-        bYes.setBounds(pmx + 10, pmy + 110, 100, 80);    //Set 'Yes' button location & dimensions
-        bYes.setBackground(colorButton);                           //Set 'Yes' button color
-        bYes.setFont(fontButton);                                  //Set 'Yes' button font
-        bYes.setText("Yes");                                       //'Yes' text
-        board.add(bYes);                                           //Add 'Yes' button to board
+        //'STAY' Button
+        ActGame aGame = new ActGame();                              //Action listener object for 'Stay'
+        btnGame.addActionListener(aGame);                             //Linking action (aStay) to 'Stay' button (bStay)
+        btnGame.setBounds(hsx + 55, hsy + 240, 120, 80);    //Set 'Stay' button location & dimensions
+        btnGame.setBackground(Color.cyan);                           //Set 'Stay' button color
+        btnGame.setFont(fontButton);
+        btnGame.setText("New");                                      //'Stay' text
+        board.add(btnGame);                                           //Add 'Stay' button to board
 
-        //'NO' Button
-        ActNo aNo = new ActNo();                                    //Action listener object for 'No'
-        bNo.addActionListener(aNo);                                 //Linking action to 'Stay' button
-        bNo.setBounds(pmx + 120, pmy + 110, 100, 80);     //Set 'Stay' button location & dimensions
-        bNo.setBackground(colorButton);                             //Set 'Stay' button color
-        bNo.setFont(fontButton);                                    //Set 'Stay' button font
-        bNo.setText("No");                                          //'Stay' text
-        board.add(bNo);                                             //Add 'Stay' button to board
+        // Shuffle Deck
+        deck.shuffle();
 
-        String suitS1 = null;                                       //Assign Suit
-        int id_setter = 0;                                          //Assign ID for every card
+        // Deal Cards
+        // Player
+        player.addCard(deck.deal());
+        player.addCard(deck.deal());
 
-        for (int s = 0; s < 4; ++s) {
-            if(s == 0) {
-                suitS1 = "Spades";
-            } else if (s == 1) {
-                suitS1 = "Hearts";
-            } else if (s == 2) {
-                suitS1 = "Diamonds";
-            } else suitS1 = "Clubs";
-            for (int i = 2; i < 15; ++i) {
-                allCards.add(new Card(i, suitS1, id_setter));
-                id_setter++;                                         //New ID for every card created
-            }
-        }
+        // Dealer Hand
+        dealer.addCard(deck.deal());
+        dealer.addCard(deck.deal());
 
-        //CARD ASSIGNMENT ATTRIBUTES
-        rand = new Random().nextInt(52);              //Generate random number 1-51 to draw from allCards
-        playerCards.add(allCards.get(rand));                 //Randomly add new card to playerCards from allCards
-        allCards.get(rand).cardUsed = true;
+        // display to console
+        System.out.println("Player Hand: \n" + player);
+        System.out.println("Dealer Hand: \n" + dealer);
+        evalPlayerHand();
+    }
 
-        //DEAL CARDS
-        //Dealer First Card Assignment:
-        rand = new Random().nextInt(52);
-        while(true) {                                       //Check if same number
-            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
-                dealerCards.add(allCards.get(rand));        // Assign to dealers hand
-                allCards.get(rand).cardUsed = true;         // Then set that card to used
-                break;
+    /**
+     * Player Hand Evaluator
+     *
+     * @author Karsen Hansen
+     * @version 1.0
+     */
+    private void evalPlayerHand() {
+        int score = player.calcValue();
+        this.lblPlayerScore.setText("Player Score: " + score);
+        if(player.isBusted()) {
+            bool_hit_stay = false;
+            bool_dealer_turn = true;
+            bHit.setEnabled(false);
+            bStay.setEnabled(false);
+            isPlayerBusted = true;
+            loser = true;
+            lblMessage.setText("Player has busted - Dealer Wins!");
+            this.lblDealScore.setText("Dealer Score: " + dealer.calcValue());
+            this.lblPlayerScore.setText("Player Score: " + score);
+            doUpdateBars();
+        } else if(player.isBlackJack()) {
+            bool_hit_stay = false;
+            bool_dealer_turn = true;
+            bHit.setEnabled(false);
+            bStay.setEnabled(false);
+            isPlayerBlackJack = true;
+            this.lblDealScore.setText("Dealer Score: " + dealer.calcValue());
+            doUpdateBars();
+            if(dealer.isBlackJack()) {
+                lblMessage.setText("Dealer & Player Hit BlackJack - Its a Draw!");
             } else {
-                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
+                lblMessage.setText("Player Hit BlackJack - Dealer Loses!");
             }
-        }
-        //Player First Card Assignment:
-        rand = new Random().nextInt(52);
-        while(true) {                                       //Check if same number
-            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
-                playerCards.add(allCards.get(rand));        // Assign to dealers hand
-                allCards.get(rand).cardUsed = true;         // Then set that card to used
-                break;
-            } else {
-                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
-            }
-        }
-        //Dealer Second Card Assignment:
-        rand = new Random().nextInt(52);
-        while(true) {                                       //Check if same number
-            if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
-                dealerCards.add(allCards.get(rand));        // Assign to dealers hand
-                allCards.get(rand).cardUsed = true;         // Then set that card to used
-                break;
-            } else {
-                rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
-            }
-        }
-        //Print Cards Dealt
-        for (Card c : playerCards) {
-            System.out.println("Player has the card " + c.name + " of " + c.suit);
-        }
-        for (Card c : dealerCards) {
-            System.out.println("Dealer has the card " + c.name + " of " + c.suit);
+            this.lblPlayerScore.setText("Player Score: " + score);
         }
     }
 
-    //Check whether Player turn, Dealer turn, or end of either - Choice to continue
+    /**
+     * Dealer Hand Evaluator
+     *
+     * @author Karsen Hansen
+     * @version 1.0
+     */
+    private void evalDealerHand() {
+        int score = dealer.calcValue();
+        this.lblDealScore.setText("Dealer Score: " + score);
+        if(dealer.isBusted()) {
+            isDealerBusted = true;
+            lblMessage.setText("Dealer has busted - Player Wins!");
+            doUpdateBars();
+       } else if(player.isBlackJack()) {
+            isDealerBlackJack = true;
+            if(player.isBlackJack()) {
+                lblMessage.setText("Dealer & Player Hit BlackJack - Its a Draw!");
+            } else {
+                loser = true;
+                lblMessage.setText("Dealer Hit BlackJack - Player Loses!");
+            }
+            doUpdateBars();
+        }
+    }
+
+    /**
+     * Check Winner
+     *
+     * @author Karsen Hansen
+     * @version 1.0
+     */
+    private void checkWinner() {
+        if(!isPlayerBusted && !isDealerBusted && !isDealerBlackJack && !isPlayerBlackJack)
+        {
+            int pScore = player.calcValue();
+            int dScore = dealer.calcValue();
+            this.lblDealScore.setText("Dealer Score: " + dScore);
+            this.lblPlayerScore.setText("Player Score: " + pScore);
+
+            if(pScore > dScore) {
+                lblMessage.setText("Player Won the Hand!");
+            } else if(pScore < dScore) {
+                loser = true;
+                lblMessage.setText("Player Lost the Hand!");
+            } else {
+                lblMessage.setText("Its a Draw!");
+            }
+        }
+        doUpdateBars();
+    }
+
+    /**
+     * Method to refresh game states and  button visibility.
+     */
     public void refresher() {
         //BUTTON VISIBILITY
         if (bool_hit_stay == true) {
             bHit.setVisible(true);
             bStay.setVisible(true);
-            bYes.setVisible(false);
-            bNo.setVisible(false);
+            btnGame.setVisible((false));
         } else if (bool_dealer_turn == true) {
             bHit.setVisible(false);
             bStay.setVisible(false);
-            bYes.setVisible(false);
-            bNo.setVisible(false);
+            btnGame.setVisible((true));
         } else if (bool_play_more == true) {
             bHit.setVisible(false);
             bStay.setVisible(false);
-            bYes.setVisible(true);
-            bNo.setVisible(true);
+            btnGame.setVisible((true));
         }
-
-        //TOTALS CHECKER
-        //PLAYER total
-        int sum = 0;
-        boolean hasAces = false;
-        for (Card c : playerCards) {
-            if (c.symbol.equalsIgnoreCase("A")) {
-                hasAces = true;
-            }
-            sum += c.value;
-        }
-        total_player_min = sum;
-        total_player_max = sum;
-
-        if (hasAces == true) {
-            total_player_max += 1;     //Only count a single ace as 11
-        }
-
-        //DEALER Total
-        sum = 0;
-        hasAces = false;
-        for (Card c : dealerCards) {
-            if (c.symbol.equalsIgnoreCase("A")) {
-                hasAces = true;
-            }
-            sum += c.value;
-        }
-        total_dealer_min = sum;
-        total_dealer_max = sum;
-
-        if (hasAces == true) {
-            total_dealer_max += 1;     //Only count a single ace as 11
-        }
-
     }
 
+    /**
+     * Method to control dealer hit/stay.
+     */
     public void dealerHitStay() {
+        while(dealer.canHit()) {
+            dealer.addCard(deck.deal());
+            evalDealerHand();
+        }
 
+        // Check winner if not previously determined
+        checkWinner();
     }
 
-    //GAME BOARD
+    /**
+     * Game Board Class
+     *
+     * @author Karsen Hansen
+     * @version 1.0
+     */
     public class Board extends JPanel {
-        //PAINTING ENTIRE BOARD
+
+        /**
+         * Method to paint entities on the game board.
+         *
+         * @param g object used to create board entities (background, cards, etc.)
+         */
         public void paintComponent(Graphics g) {
             g.setColor(colorBackground);                            //Game board background
             g.fillRect(0, 0, aW, aH);                        //Game board (Background) dimensions
@@ -270,25 +351,13 @@ public class GUI extends JFrame {
             g.drawRect(gridx, gridy, gridw, gridh);
 
             //Paints Temporary Bottom Log Borders
-            g.drawRect(gridx, gridy + gridh + 50, gridw, 500);
+            g.drawRect(gridx, gridy + gridh + 50, gridw, 200);
 
             //Paints Temporary Totals & Command Messages
             g.drawRect(hsx, hsy, hsw, hsh);
 
             //Paints Temporary "Play More?" Grid & Player Totals
             g.drawRect(pmx, pmy, pmw, pmh);
-            if (bool_play_more == true) {
-                g.setFont(fontQuestion);
-                g.drawString(play_more_q, pmx + 26, pmy + 60);
-            } else if (bool_hit_stay == true) {
-                g.setFont(fontQuestion);
-                g.drawString(Integer.toString(total_player_min) + "/" + Integer.toString(total_player_max), hsx + 62, hsy + 220);
-            } else if (bool_dealer_turn) {
-                g.setFont(fontQuestion);
-                g.drawString(Integer.toString(total_player_min) + "/" + Integer.toString(total_player_max), hsx + 65, hsy + 120);
-                g.drawString(Integer.toString(total_dealer_min) + "/" + Integer.toString(total_dealer_max), hsx + 65, hsy + 320);
-
-            }
 
             //Paints Card Grid Rectangles
             for (int i = 0; i < 6; ++i) {
@@ -298,7 +367,8 @@ public class GUI extends JFrame {
 
             //PLAYERS CARDS PAINT
             int index = 0;                          //Creates new card
-            for (Card c : playerCards) {
+            for (int i = 0; i < player.getCount(); i++) {
+                Card c = player.getCard(i);
                 g.setColor(Color.white);            //Create card background color
 
                 //First RECTANGLE drawn for card edge softening (Height)
@@ -323,7 +393,7 @@ public class GUI extends JFrame {
                 }
 
                 g.setFont(fontCard);
-                g.drawString(c.symbol, gridx + index * cardTW + cardSpacing*2, gridy + cardAH);
+                g.drawString(c.symbol, gridx + index * cardTW + cardSpacing * 2, gridy + cardAH);
 
                 //Painting SUIT SYMBOL on cards
                 //SPADES paint
@@ -333,13 +403,13 @@ public class GUI extends JFrame {
                     g.fillOval(gridx + index * cardTW + 70, gridy + 85, 40, 40);
                     g.fillArc(gridx + index * cardTW + 30, gridy + 28, 90, 70, 230, 80);
                     g.fillRect(gridx + index * cardTW + 70, gridy + 90, 10, 50);
-                //HEARTS paint
+                    //HEARTS paint
                 } else if (c.suit.equalsIgnoreCase("Hearts")) {
                     g.setColor(Color.red);
                     g.fillOval(gridx + index * cardTW + 40, gridy + 70, 40, 40);
                     g.fillOval(gridx + index * cardTW + 70, gridy + 70, 40, 40);
                     g.fillArc(gridx + index * cardTW + 30, gridy + 97, 90, 70, 50, 80);
-                //DIAMONDS paint
+                    //DIAMONDS paint
                 } else if (c.suit.equalsIgnoreCase("Diamonds")) {
                     g.setColor(Color.red);
                     //Diamond suit symbol tip coordinates
@@ -360,7 +430,7 @@ public class GUI extends JFrame {
                     int[] yPoly = {y1, y2, y3, y4};
                     //Fill dual int poly array with x & y points = 4 points each
                     g.fillPolygon(xPoly, yPoly, 4);
-                //CLUBS paint
+                    //CLUBS paint
                 } else if (c.suit.equalsIgnoreCase("Clubs")) {
                     g.setColor(Color.black);
                     g.fillOval(gridx + index * cardTW + 35, gridy + 85, 40, 40);
@@ -373,9 +443,10 @@ public class GUI extends JFrame {
             }
 
             //DEALER CARD PAINT
-                if (bool_dealer_turn == true) {     //Toggle dealer turn to hide/show cards
+            if (bool_dealer_turn == true) {     //Toggle dealer turn to hide/show cards
                 index = 0;                          //Creates new card
-                for (Card c : dealerCards) {
+                for (int i = 0; i < dealer.getCount(); i++) {
+                    Card c = dealer.getCard(i);
                     g.setColor(Color.white);            //Create card background color
 
                     //First RECTANGLE drawn for card edge softening (Height)
@@ -400,7 +471,7 @@ public class GUI extends JFrame {
                     }
 
                     g.setFont(fontCard);
-                    g.drawString(c.symbol, gridx + index * cardTW + cardSpacing*2, gridy + cardTH + cardAH);
+                    g.drawString(c.symbol, gridx + index * cardTW + cardSpacing * 2, gridy + cardTH + cardAH);
 
                     //Painting SUIT SYMBOL on cards
                     //SPADES paint
@@ -452,32 +523,41 @@ public class GUI extends JFrame {
         }
     }
 
-    /*
-    * ACTION LISTENER METHOD OVERRIDES
-    */
+    /**
+     * ActHit Class Implementation of ActionListener for overridden actionPerformed Method on 'Hit'.
+     *
+     * @see ActHit
+     * @author Karsen Hansen
+     * @version 1.0
+     */
     //'HIT' Button Action Listener
     public class ActHit implements ActionListener {             //Action Listener
-
         @Override                                               //Auto-Overridden Method
+        /**
+         * Overridden method for 'STAY' button action
+         *
+         * @param e used to take an actionPerformed on 'HIT' button.
+         */
         public void actionPerformed(ActionEvent e) {
             System.out.println("You just clicked the 'HIT' Button!");
-            rand = new Random().nextInt(52);
-            while(true) {                                       //Check if same number
-                if (allCards.get(rand).cardUsed == false) {     // If it hasn't been used...
-                    playerCards.add(allCards.get(rand));        // Assign to dealers hand
-                    allCards.get(rand).cardUsed = true;         // Then set that card to used
-                    break;
-                } else {
-                    rand = new Random().nextInt(52);     //Otherwise, if it has already been used create a new random
-                }
-            }
+            player.addCard(deck.deal());
+            evalPlayerHand();
         }
     }
 
-    //'STAY' Button Action Listener
+    /**
+     * ActStay Class Implementation of ActionListener for overridden actionPerformed Method on 'Stay'.
+     *
+     * @see ActHit
+     */
     public class ActStay implements ActionListener {
 
         @Override
+        /**
+         * Overridden method for 'STAY' button action
+         *
+         * @param e used to take an actionPerformed on 'STAY' button.
+         */
         public void actionPerformed(ActionEvent e) {
             System.out.println("You just clicked the 'STAY' Button!");
             bool_hit_stay = false;
@@ -486,22 +566,67 @@ public class GUI extends JFrame {
         }
     }
 
-    //'YES' Button Action Listener
-    public class ActYes implements ActionListener {
+    /**
+     * Method to update player and dealer health bars.
+     */
+    private void doUpdateBars() {
+        if(loser) {
+            if(isPlayerBusted) {
+                playerHealth -= (player.calcValue() - 21);
+            } else {
+                playerHealth -= (21 - player.calcValue());
+            }
+            playerBar.setValue(playerHealth);
+            if(playerHealth < 0) playerHealth = 0;
+            playerBar.setString(String.format("Player: %.2f%%", ((double)playerHealth)));
+        } else {
+            if(isDealerBusted) {
+                dealerHealth -= (dealer.calcValue() - 21);
+            } else {
+                dealerHealth -= (21 - dealer.calcValue());
+            }
+            dealerBar.setValue(dealerHealth);
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("You just clicked the 'YES' Button!");
+            if(dealerHealth < 0) dealerHealth = 0;
+            dealerBar.setString(String.format("Dealer: %.2f%%", ((double)dealerHealth)));
+        }
+
+        if(dealerHealth <= 0 || playerHealth <= 0) {
+            btnGame.setVisible(false);
+            System.exit(0);
         }
     }
 
-    //'NO' Button Action Listener
-    public class ActNo implements ActionListener {
-
+    /**
+     * Class ActGame which implements ActionListener for game events.
+     *
+     * @author Karsen Hansen
+     * @version 1.0
+     */
+    // Handle the new Hand playing
+    public class ActGame implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("You just clicked the 'NO' Button!");
+            System.out.println("You just clicked the 'New' Button!");
+            bool_hit_stay = true;
+            bool_dealer_turn = false;
+            player.reset();
+            dealer.reset();
+            deck.reset();
+            deck.shuffle();
+            loser = false;
+            player.addCard(deck.deal());
+            player.addCard(deck.deal());
+            dealer.addCard(deck.deal());
+            dealer.addCard(deck.deal());
+            isPlayerBlackJack = false;
+            isDealerBlackJack = false;
+            isDealerBusted = false;
+            isPlayerBusted = false;
+            bHit.setEnabled(true);
+            bStay.setEnabled(true);
+            evalPlayerHand();
+            lblDealScore.setText("Dealer Score: ");
         }
     }
-
 }

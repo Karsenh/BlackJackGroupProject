@@ -1,17 +1,26 @@
+/**
+ * Card Class
+ *
+ * @author Karsen Hansen
+ * @version 1.0
+ */
 public class Card {
 
     int number;                     //Card value (1-10, J, Q, K)
     String suit;                    //Card suit (Hearts, Diamonds, Spades, Clubs)
-    boolean cardUsed = false;       //If the card is used or not
     String symbol;
     String name;
-    int id;
     int value;
 
-    public Card(int n, String s, int id) {         //Card Constructor
+    /**
+     * Constructor to setup the Card
+     *
+     * @param n to set card number value.
+     * @param s to set card suit.
+     */
+    public Card(int n, String s) {         //Card Constructor
         this.number = n;
         this.suit = s;
-        this.id = id;
 
         if (number < 11) {
             symbol = Integer.toString(number);      //Converts integer value passed in to a String
@@ -34,18 +43,5 @@ public class Card {
             name = "Ace";
             value = 11;
         }
-
-        /**
-        public void setUsed() {
-            used = true;
-            System.out.println("The card " + name + " of " + suit + " is now used.");
-        }
-
-        public void setNotUsed() {
-            System.out.println("The card " + name + " of " + suit + " is not used.");
-        }
-         **/
-        //System.out.println("Card " + name + " of " + suit + " was created. ID = " + this.id);
     }
-
 }
